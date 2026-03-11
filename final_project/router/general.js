@@ -6,38 +6,100 @@ const public_users = express.Router();
 
 
 public_users.post("/register", (req,res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const username = req.body.username;
+  const password = req.body.password;
+
+  if (username && password) {
+    if (!isValid(username)) { 
+      users.push({"username":username,"password":password});
+      return res.status(200).json({message: "User successfully registred. Now you can login"});
+    } else {
+      return res.status(404).json({message: "User already exists!"});    
+    }
+  } 
+  return res.status(404).json({message: "Unable to register user. Username and password are required."});
 });
 
-// Get the book list available in the shop
-public_users.get('/',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+// Task 10: Get the book list available in the shop using Promises
+public_users.get('/', function (req, res) {
+  let getBooks = new Promise((resolve, reject) => {
+    resolve(books);
+  });
+
+  getBooks.then((bks) => {
+    res.send(JSON.stringify(bks, null, 4));
+  }).catch((err) => {
+    res.status(500).send("Error fetching books");
+  });
 });
 
-// Get book details based on ISBN
+// Task 11: Get book details based on ISBN using Promises
 public_users.get('/isbn/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const isbn = req.params.isbn;
+  
+  let getBookByISBN = new Promise((resolve, reject) => {
+    if(books[isbn]) {
+      resolve(books[isbn]);
+    } else {
+      reject({message: "Book not found"});
+    }
+  });
+
+  getBookByISBN.then((book) => {
+    res.send(book);
+  }).catch((err) => {
+    res.status(404).json(err);
+  });
  });
   
-// Get book details based on author
+// Task 12: Get book details based on author using Promises
 public_users.get('/author/:author',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const author = req.params.author;
+
+  let getBooksByAuthor = new Promise((resolve, reject) => {
+    const filteredBooks = Object.values(books).filter(book => book.author === author);
+    if(filteredBooks.length > 0) {
+      resolve(filteredBooks);
+    } else {
+      reject({message: "No books found for this author"});
+    }
+  });
+
+  getBooksByAuthor.then((bks) => {
+    res.send({booksByAuthor: bks});
+  }).catch((err) => {
+    res.status(404).json(err);
+  });
 });
 
-// Get all books based on title
+// Task 13: Get all books based on title using Promises
 public_users.get('/title/:title',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const title = req.params.title;
+  
+  let getBooksByTitle = new Promise((resolve, reject) => {
+    const filteredBooks = Object.values(books).filter(book => book.title === title);
+    if(filteredBooks.length > 0) {
+      resolve(filteredBooks);
+    } else {
+      reject({message: "No books found with this title"});
+    }
+  });
+
+  getBooksByTitle.then((bks) => {
+    res.send({booksByTitle: bks});
+  }).catch((err) => {
+    res.status(404).json(err);
+  });
 });
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const isbn = req.params.isbn;
+  if(books[isbn]) {
+    res.send(books[isbn].reviews);
+  } else {
+    res.status(404).json({message: "Book not found"});
+  }
 });
 
 module.exports.general = public_users;

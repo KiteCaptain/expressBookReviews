@@ -20,17 +20,17 @@ public_users.post("/register", (req,res) => {
   return res.status(404).json({message: "Unable to register user. Username and password are required."});
 });
 
-// Task 10: Get the book list available in the shop using Promises
-public_users.get('/', function (req, res) {
-  let getBooks = new Promise((resolve, reject) => {
-    resolve(books);
-  });
-
-  getBooks.then((bks) => {
-    res.send(JSON.stringify(bks, null, 4));
-  }).catch((err) => {
+// Task 10: Get the book list available using async callback function
+public_users.get('/', async function (req, res) {
+  try {
+    const getBooks = await new Promise((resolve, reject) => {
+      resolve(books);
+    });
+    
+    res.send(JSON.stringify(getBooks, null, 4));
+  } catch (error) {
     res.status(500).send("Error fetching books");
-  });
+  }
 });
 
 // Task 11: Get book details based on ISBN using Promises
